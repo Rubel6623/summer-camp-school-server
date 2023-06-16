@@ -29,7 +29,10 @@ async function run() {
     const classCollections=client.db("schoolDb").collection("classes");
     const reviewCollections=client.db("schoolDb").collection("reviews");
 
-
+    app.get('/classes', async(req,res)=>{
+      const result=await classCollections.find().toArray();
+      res.send(result);
+    })
 
 
     // Send a ping to confirm a successful connection
