@@ -26,17 +26,32 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
 
-    const classCollections=client.db("schoolDb").collection("classes");
-    const reviewCollections=client.db("schoolDb").collection("reviews");
-    const selectedClassCollections=client.db("schoolDb").collection("selectedClass");
+    const classCollection=client.db("schoolDb").collection("classes");
+    const reviewCollection=client.db("schoolDb").collection("reviews");
+    const usersCollection=client.db("schoolDb").collection("users");
+    const selectedClassCollection=client.db("schoolDb").collection("selectedClass");
+
+    // create user api
+    app.post('/users', async(req,res)=>{
+      const user=req.body;
+      console.log(user)
+      const query={email:user.email}
+      const existingUser =await usersCollection.findOne(query);
+      console.log('existing User :',existingUser);
+      if(existingUser){
+        return res.send({message:'user already exists'})
+      }
+      const result=await usersCollection.insertOne(user);
+      res.send(result);
+    })
 
     app.get('/classes', async(req,res)=>{
-      const result=await classCollections.find().toArray();
+      const result=await classCollection.find().toArray();
       res.send(result);
     })
 
     app.get('/reviews', async(req,res)=>{
-      const result=await reviewCollections.find().toArray();
+      const result=await reviewCollection.find().toArray();
       res.send(result);
     })
 
@@ -48,21 +63,21 @@ async function run() {
         res.send([]);
       }
       const query={email:email};
-      const result=await selectedClassCollections.find(query).toArray();
+      const result=await selectedClassCollection.find(query).toArray();
       res.send(result);
     })
 
     app.post('/myClasses', async(req,res)=>{
       const selectedClass=req.body;
       console.log(selectedClass);
-      const result=await selectedClassCollections.insertOne(selectedClass);
+      const result=await selectedClassCollection.insertOne(selectedClass);
       res.send(result);
     })
 
     app.delete('/myClasses/:id', async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
-      const result = await selectedClassCollections.deleteOne(query);
+      const result = await selectedClassCollection.deleteOne(query);
       res.send(result);
     })
 
