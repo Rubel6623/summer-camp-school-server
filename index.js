@@ -32,6 +32,11 @@ async function run() {
     const selectedClassCollection=client.db("schoolDb").collection("selectedClass");
 
     // create user api
+    app.get('/users', async(req,res)=>{
+      const result=await usersCollection.find().toArray();
+      res.send(result);
+    })
+
     app.post('/users', async(req,res)=>{
       const user=req.body;
       console.log(user)
@@ -55,6 +60,19 @@ async function run() {
       res.send(result);
     })
 
+    // make admin
+    app.patch('/users/admin/:id', async(req,res)=>{
+      const id=req.params.id;
+      const filter= {_id: new ObjectId(id)};
+      const updateDoc = {
+        $set: {
+          role: 'admin' || 'instructor'
+        },
+      };
+      const result =await usersCollection.updateOne(filter,updateDoc);
+      res.send(result);
+    })
+    
     // selected classes
     app.get('/myClasses', async(req,res)=>{
       const email=req.query.email;
