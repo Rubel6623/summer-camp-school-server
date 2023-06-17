@@ -28,9 +28,34 @@ async function run() {
 
     const classCollections=client.db("schoolDb").collection("classes");
     const reviewCollections=client.db("schoolDb").collection("reviews");
+    const selectedClassCollections=client.db("schoolDb").collection("selectedClass");
 
     app.get('/classes', async(req,res)=>{
       const result=await classCollections.find().toArray();
+      res.send(result);
+    })
+
+    app.get('/reviews', async(req,res)=>{
+      const result=await reviewCollections.find().toArray();
+      res.send(result);
+    })
+
+    // selected classes
+    app.get('/myClasses', async(req,res)=>{
+      const email=req.query.email;
+      console.log(email);
+      if(!email){
+        res.send([]);
+      }
+      const query={email:email};
+      const result=await selectedClassCollections.find(query).toArray();
+      res.send(result);
+    })
+
+    app.post('/myClasses', async(req,res)=>{
+      const selectedClass=req.body;
+      console.log(selectedClass);
+      const result=await selectedClassCollections.insertOne(selectedClass);
       res.send(result);
     })
 
